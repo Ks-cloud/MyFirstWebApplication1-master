@@ -20,8 +20,11 @@ namespace MyFirstWebApplication1.Installers
                 options.UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
+                /** automatically add the RoleManager to the IdentityRole */
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>();
 
+            /** scoped means that the lifetime of this is the same as the lifetime of request - that's done for tracking */
             services.AddScoped<IPostService, PostService>();
         }
     }

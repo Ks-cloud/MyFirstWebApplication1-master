@@ -13,6 +13,6 @@ namespace MyFirstWebApplication1.Services
         Task<bool> CreatePostAsync(Post post);
         Task<bool> UpdatePostAsync(Post postToUpdate);
         Task<bool> DeletePostAsync(Guid PostId);
-        Task<bool> UserOwnsPostAsync(Guid postId, Func<string> getUserId);
+        Task<bool> UserOwnsPostAsync(Guid postId, string userId);
     }
 }

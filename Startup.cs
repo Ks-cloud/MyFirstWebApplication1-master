@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -14,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using MyFirstWebApplication1.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MyFirstWebApplication1.Installers;
 
@@ -32,10 +34,11 @@ namespace MyFirstWebApplication1
         public void ConfigureServices(IServiceCollection services)
         {
             services.InstallServicesInAssembly(Configuration);
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -46,6 +49,11 @@ namespace MyFirstWebApplication1
                 app.UseHsts();
             }
 
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseAuthentication();
+
             var swaggerOptions = new Options.SwaggerOptions();
             Configuration.GetSection(nameof(Options.SwaggerOptions)).Bind(swaggerOptions);
 
@@ -54,11 +62,6 @@ namespace MyFirstWebApplication1
             {
                 option.SwaggerEndpoint(swaggerOptions.UIEndpoint, swaggerOptions.Description);
             });
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
-            app.UseAuthentication();
 
             app.UseMvc();
         }

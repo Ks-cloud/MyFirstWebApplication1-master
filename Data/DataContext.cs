@@ -14,8 +14,9 @@ namespace MyFirstWebApplication1.Data
         {
         }
 
+        /** Create a table called Posts with elements of type <Post> */
         public DbSet<Post> Posts { get; set; }
 
-        public DBSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace MyFirstWebApplication1.Extensions
 {
     public static class GeneralExtensions
     {
+        /** HttpContext - a bunch of HTTP-props about a current HTTP-request in a controller */
         public static string GetUserId(this HttpContext httpContext)
         {
             if (httpContext.User == null)
@@ -15,7 +16,7 @@ namespace MyFirstWebApplication1.Extensions
                 return string.Empty;
             }
             /**
-             * return the userId from the token 
+             * return the userId from the token, because the claim will automatically rebound to this object called User 
              */
             return httpContext.User.Claims.Single(x => x.Type == "id").Value;
         }

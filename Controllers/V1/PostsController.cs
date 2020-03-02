@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 using MyFirstWebApplication1.Contracts;
 using MyFirstWebApplication1.Domain;
 using MyFirstWebApplication1.Controllers.v1.Requests;
@@ -14,20 +16,31 @@ using MyFirstWebApplication1.Extensions;
 
 namespace MyFirstWebApplication1.Controllers.V1
 {
+    /** Roles = "Admin, Poster" - requires Admin or Poster role from User
+     * [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin, Poster")]
+     */
+
+    /** Roles - requires both roles assigned to User
+     * Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+     * Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Poster")]
+     */
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PostsController : Controller
     {
         private readonly IPostService _postService;
+        private readonly IMapper _mapper;
 
-        public PostsController(IPostService postService)
+        public PostsController(IPostService postService, IMapper mapper)
         {
             _postService = postService;
+            _mapper = mapper;
         }
 
         [HttpGet(ApiRoutes.Posts.GetAll)]
         public async Task<IActionResult> GetALL()
         {
-            return Ok(await _postService.GetPostsAsync());
+            var posts = await _postService.GetPostsAsync();
+            return Ok(_mapper.Map<List<PostResponse>>(posts));
         }
 
         [HttpGet(ApiRoutes.Posts.Get)]
@@ -40,7 +53,7 @@ namespace MyFirstWebApplication1.Controllers.V1
                 return NotFound();
             }
 
-            return Ok(post);
+            return Ok(_mapper.Map<PostResponse>(post));
         }
 
         [HttpPost(ApiRoutes.Posts.Create)]
@@ -53,14 +66,14 @@ namespace MyFirstWebApplication1.Controllers.V1
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var locationUri = baseUrl + "/" + ApiRoutes.Posts.Get.Replace("{postId}", post.Id.ToString());
 
-            var response = new PostResponse {Id = post.Id};
-            return Created(locationUri, response);
+            return Created(locationUri, _mapper.Map<PostResponse>(post));
         }
 
         [HttpPut(ApiRoutes.Posts.Update)]
         public async Task<IActionResult> Update([FromRoute] Guid postId, [FromBody]UpdatePostRequest updatePostRequest)
         {
-            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId);
+            /** we need to make that this User has actually owns this post */
+        var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
 
             if (!userOwnsPost)
             {
@@ -74,7 +87,7 @@ namespace MyFirstWebApplication1.Controllers.V1
 
             if (updatedPost)
             {
-                return Ok(updatedPost);
+                return Ok(_mapper.Map<PostResponse>(post));
             }
 
             return NotFound();
@@ -83,7 +96,7 @@ namespace MyFirstWebApplication1.Controllers.V1
         [HttpDelete(ApiRoutes.Posts.Delete)]
         public async Task<IActionResult> Delete([FromRoute] Guid postId)
         {
-            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId);
+            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
 
             if (!userOwnsPost)
             {

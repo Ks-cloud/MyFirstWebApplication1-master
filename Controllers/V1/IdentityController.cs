@@ -21,7 +21,7 @@ namespace MyFirstWebApplication1.Contracts.V1
         }
 
         [HttpPost(ApiRoutes.Identity.Register)]
-        public async Task<IActionResult> Login([FromBody] UserRegistrationRequest request)
+        public async Task<IActionResult> RegisterAsync([FromBody] UserRegistrationRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -48,7 +48,7 @@ namespace MyFirstWebApplication1.Contracts.V1
         }
 
         [HttpPost(ApiRoutes.Identity.Login)]
-        public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
+        public async Task<IActionResult> LoginAsync([FromBody] UserLoginRequest request)
         {
             var authResponse = await _identityService.LoginAsync(request.Email, request.Password);
 
@@ -68,7 +68,7 @@ namespace MyFirstWebApplication1.Contracts.V1
         }
 
         [HttpPost(ApiRoutes.Identity.Refresh)]
-        public async Task<IActionResult> Login([FromBody] RefreshTokenRequest request)
+        public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequest request)
         {
             var authResponse = await _identityService.RefreshTokenAsync(request.Token, request.RefreshToken);
 

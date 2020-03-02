@@ -19,7 +19,7 @@ namespace MyFirstWebApplication1.Services
             _dataContext = dataContext;
         }
 
-
+        /** method that returns list of posts */
         public async Task<List<Post>> GetPostsAsync()
         {
             return await _dataContext.Posts.ToListAsync();
@@ -42,6 +42,7 @@ namespace MyFirstWebApplication1.Services
             _dataContext.Posts.Update(postToUpdate);
             /** method returns an integer *updated* - a count of elements being updated */
             var updated = await _dataContext.SaveChangesAsync();
+            /** in order to return bool */
             return updated > 0;
         } 
 
@@ -58,8 +59,9 @@ namespace MyFirstWebApplication1.Services
             return deleted > 0;
         }
 
-        public async Task<bool> UserOwnsPostAsync(Guid postId, string userId) 
+        public async Task<bool> UserOwnsPostAsync(Guid postId, string userId)
         {
+            /** it tells us user owns the post or not */
             var post = await _dataContext.Posts.AsNoTracking().SingleOrDefaultAsync(x => x.Id == postId);
 
             if (post == null)

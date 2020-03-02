@@ -11,6 +11,7 @@ namespace MyFirstWebApplication1.Domain
     public class RefreshToken
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Token { get; set; }
 
         public string JwtId { get; set; }
